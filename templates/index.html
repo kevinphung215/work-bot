@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complainant Affidavit Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1 style="text-align: center;">Complainant Affidavit Generator</h1>
+
+    <form method="POST" onsubmit="return validateForm()">
+        <div class="info">
+            <h3>Case Information</h3>
+            <input type="text" name="case_number" placeholder="Case Number" required><br>
+
+            <div class="name-group">
+                <input type="text" name="first_name" placeholder="First Name" required>
+                <input type="text" name="middle_name" placeholder="Middle Name">
+                <input type="text" name="last_name" placeholder="Last Name" required>
+            </div>
+
+            <div class="case_info">
+                <input type="text" name="work_location" placeholder="Work Location"><br>
+                <input type="text" name="position_title" placeholder="Position Title"><br>
+                <input type="text" name="position_level" placeholder="Position Level"><br>
+                <input type="text" name="address" placeholder="Address"><br>
+                <input type="text" name="unit" placeholder="Unit Assigned"><br>
+                <input type="email" name="email" placeholder="Email"><br>
+                <input type="text" name="phone" placeholder="Phone"><br>
+            </div>
+            <label for="hide_investigator_info">Hide Investigator Info:</label>
+            <input type="checkbox" name="hide_investigator_info"><br>
+        </div>
+
+        <h3>Purviews</h3>
+        <div class="purview-container">
+            <label><input type="checkbox" name="race"> Race</label>
+            <input type="text" name="race_details" placeholder="Enter Race Details">
+
+            <label><input type="checkbox" name="color"> Color</label>
+            <input type="text" name="color_details" placeholder="Enter Color Details">
+            <label><input type="checkbox" name="religion"> Religion</label>
+            <input type="text" name="religion_details" placeholder="Enter Religion Details">
+            
+            <label><input type="checkbox" name="sex"> Sex</label>
+            <input type="text" name="sex_details" placeholder="Enter Sex Details">
+            <label><input type="checkbox" name="sexual_orientation"> Sexual Orientation</label>
+            <input type="text" name="sexual_orientation_details" placeholder="Enter Sexual Orientation Details">
+            <label><input type="checkbox" name="national_origin"> National Origin</label>
+            <input type="text" name="national_origin_details" placeholder="Enter National Origin Details">
+            <label><input type="checkbox" name="age"> Age</label>
+            <input type="text" name="age_details" placeholder="Enter Age Details">
+        </div>
+
+        <label><input type="checkbox" name="retaliation"> Retaliation</label>
+        <label><input type="checkbox" name="disability"> Disability</label>
+        <label><input type="checkbox" name="gina"> GINA</label>
+        <label><input type="checkbox" name="discrete"> Discrete</label>
+        <label><input type="checkbox" name="non_discrete"> Non Discrete</label>
+        <label><input type="checkbox" name="non_selection"> Non Selection</label>
+        <label><input type="checkbox" name="accommodation"> Accommodation</label>
+        <label><input type="checkbox" name="harassment"> Harassment</label>
+
+        <button type="submit">Generate Affidavit</button>
+    </form>
+
+    <script>
+        function validateForm() {
+            // Example validation logic
+            const caseNumber = document.querySelector('input[name="case_number"]').value;
+            if (!caseNumber) {
+                alert('Case Number is required.');
+                return false; // Prevent form submission
+            }
+            // Add more validation as needed
+            alert('Affidavit Created');
+            return true; // Allow form submission
+        }
+    </script>
+</body>
+</html>
