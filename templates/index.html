@@ -31,6 +31,12 @@
             </div>
             <label for="hide_investigator_info">Hide Investigator Info:</label>
             <input type="checkbox" name="hide_investigator_info"><br>
+
+            <div class="allegation-container">
+                <h3>Allegations</h3>
+                <input type="number" name="allegation_qty" id="allegationQty" placeholder="Number of allegations" min="0" style="width: 170px;">
+                <div id="allegationInputsContainer"></div>
+            </div>
         </div>
 
         <h3>Purviews</h3>
@@ -42,7 +48,6 @@
             <input type="text" name="color_details" placeholder="Enter Color Details">
             <label><input type="checkbox" name="religion"> Religion</label>
             <input type="text" name="religion_details" placeholder="Enter Religion Details">
-            
             <label><input type="checkbox" name="sex"> Sex</label>
             <input type="text" name="sex_details" placeholder="Enter Sex Details">
             <label><input type="checkbox" name="sexual_orientation"> Sexual Orientation</label>
@@ -53,19 +58,99 @@
             <input type="text" name="age_details" placeholder="Enter Age Details">
         </div>
 
-        <label><input type="checkbox" name="retaliation"> Retaliation</label>
-        <label><input type="checkbox" name="disability"> Disability</label>
-        <label><input type="checkbox" name="gina"> GINA</label>
-        <label><input type="checkbox" name="discrete"> Discrete</label>
-        <label><input type="checkbox" name="non_discrete"> Non Discrete</label>
-        <label><input type="checkbox" name="non_selection"> Non Selection</label>
-        <label><input type="checkbox" name="accommodation"> Accommodation</label>
-        <label><input type="checkbox" name="harassment"> Harassment</label>
+        <h3>Complaints</h3>
+        <div class="complaint-container">
+            <label><input type="checkbox" name="retaliation"> Retaliation</label>
+            <label><input type="checkbox" name="disability"> Disability</label>
+            <label><input type="checkbox" name="gina"> GINA</label>
+            <label><input type="checkbox" name="discrete"> Discrete</label>
+            <label><input type="checkbox" name="non_discrete"> Non Discrete</label>
+            <label><input type="checkbox" name="non_selection"> Non Selection</label>
+            <label><input type="checkbox" name="accommodation"> Accommodation</label>
+            <label><input type="checkbox" name="harassment"> Harassment</label>
+        </div>
 
         <button type="submit">Generate Affidavit</button>
     </form>
 
     <script>
+        // Allegation number input handler
+        document.getElementById('allegationQty').addEventListener('input', function(e) {
+            const container = document.getElementById('allegationInputsContainer');
+            container.innerHTML = ''; // Clear previous inputs
+            
+            const num = parseInt(this.value) || 0;
+            
+            for(let i = 1; i <= num; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.style.margin = '5px 0';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = `allegation_input_${i}`;
+                input.placeholder = `Allegation #${i} Details`;
+                input.style.width = '300px';
+                
+                wrapper.appendChild(input);
+                container.appendChild(wrapper);
+            }
+        });
+
+    // Allow user to input value to create inputs
+        document.querySelectorAll('.complaint-container input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function(e) {
+                const containerId = `dynamicInputsContainer-${this.name}`;
+                const numberInputId = `numberInput-${this.name}`;
+                let numberInput = document.getElementById(numberInputId);
+                let dynamicContainer = document.getElementById(containerId);
+
+                // Remove elements when unchecked
+                if (!this.checked) {
+                    if (numberInput) numberInput.remove();
+                    if (dynamicContainer) dynamicContainer.remove();
+                    return;
+                }
+
+                // Create number input if it doesn't exist
+                if (!numberInput) {
+                    numberInput = document.createElement('input');
+                    numberInput.type = 'number';
+                    numberInput.min = '1';
+                    numberInput.placeholder = 'Qty';
+                    numberInput.style.width = '60px';
+                    numberInput.style.marginLeft = '10px';
+                    numberInput.id = numberInputId;
+                    
+                    // Insert number input after checkbox label
+                    this.closest('label').insertAdjacentElement('afterend', numberInput);
+                }
+
+                // Update dynamic inputs when number changes
+                numberInput.oninput = function() {
+                    if (dynamicContainer) dynamicContainer.remove();
+                    
+                    const num = parseInt(this.value) || 0;
+                    if (num < 1) return;
+
+                    dynamicContainer = document.createElement('div');
+                    dynamicContainer.id = containerId;
+                    dynamicContainer.style.display = 'inline';
+                    dynamicContainer.style.marginLeft = '10px';
+
+                    for (let i = 0; i < num; i++) {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.placeholder = `${checkbox.name} ${i + 1}`;
+                        input.name = `${checkbox.name}_input_${i + 1}`;
+                        input.style.marginRight = '5px';
+                        dynamicContainer.appendChild(input);
+                    }
+
+                    numberInput.insertAdjacentElement('afterend', dynamicContainer);
+                };
+            });
+        });
+
         function validateForm() {
             // Example validation logic
             const caseNumber = document.querySelector('input[name="case_number"]').value;

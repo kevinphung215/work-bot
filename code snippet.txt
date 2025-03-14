@@ -1,0 +1,21 @@
+use in example of template
+
+
+{% if show_retaliation_section %}
+  Retaliation Details:
+  {% for detail in complaint_type.retaliation %}
+    - {{ detail }}
+  {% endfor %}
+{% endif %}
+
+retaliation_input_1
+
+
+{% if allegations %}
+Allegations:
+{% for allegation in allegations %}
+{{ loop.index }}. {{ allegation }}
+{% endfor %}
+{% endif %}
+
+allegation_input_1
