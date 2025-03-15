@@ -29,6 +29,7 @@ def index():
             "sexual_orientation_details": request.form["sexual_orientation_details"],
             "national_origin_details": request.form["national_origin_details"],
             "age_details": request.form["age_details"],
+            "named_comparator": request.form["named_comparator"],
             "allegations": [
                 request.form[key]
                 for key in request.form
