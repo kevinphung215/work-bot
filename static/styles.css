@@ -12,7 +12,6 @@ body {
     font-family: Arial, sans-serif;
     padding: 20px;
     background-color: #f4f4f4;
-    text-align: center; /* Center the title */
 }
 
 h1 {
@@ -35,18 +34,22 @@ label {
     display: block;
     margin: 10px 0 5px;
 }
+
 .info {
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     border-radius: 4px;
+    text-align: center;
 }
+
 .name-group {
     display: flex;
-    justify-content: center; /* Center the name fields */
+    /* justify-content: space-evenly; */
 }
+
 .case_info {
     display: flex;
-    flex-wrap: wrap;
+    /* flex-wrap: wrap; */
 }
 
 input[type="text"],
@@ -67,27 +70,39 @@ input[type="email"]:focus {
     border-color: #5cb85c; /* Change border color on focus */
 }
 
-
 input[type="text"]:last-child,
 input[type="email"]:last-child {
     margin-right: 0;
 }
 
-.purview-container {
-    display: grid;
-    grid-template-columns: 1fr 5fr;
+.complaints-group {
+    display: flex;
+    justify-content: space-evenly;
 }
 
-.purview-checkboxes label,
+.purview-checkboxes label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
 .purview-inputs input {
     height: 40px;
     display: flex;
     align-items: center;
+    margin-left: 0; /* Remove any left margin if present */
 }
 
 .purview-inputs input[type="text"] {
     width: 100%;
     margin-bottom: 10px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    width: 100%;
 }
 
 button {
@@ -97,9 +112,9 @@ button {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s; /* Add transition for background color */
+    transition: background-color 0.3s;
+    width: 200px; /* Fixed width for better appearance */
 }
-
 
 button:hover {
     background-color: #4cae4c;

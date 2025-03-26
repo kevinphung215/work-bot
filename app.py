@@ -9,6 +9,22 @@ app.secret_key = "your_secret_key"  # Change this to a random secret key
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
+        # List of all complaint types
+        complaint_types = [
+            "retaliation", "disability", "gina", "discrete",
+            "non_discrete", "non_selection", "accommodation", "harassment"
+        ]
+        # Build complaint_type dictionary with dynamic inputs
+        complaint_type_data = {}
+        for complaint in complaint_types:
+            # Get all inputs for this complaint type
+            inputs = [
+                request.form[key]
+                for key in request.form
+                if key.startswith(f"{complaint}_input_")
+            ]
+            complaint_type_data[complaint] = inputs
+            
         data = {
             "case_number": request.form["case_number"],
             "first_name": request.form["first_name"],
@@ -49,19 +65,12 @@ def index():
                 "national_origin": "national_origin" in request.form,
                 "age": "age" in request.form,
             },
-            "complaint_type": {
-                complaint: [
-                    request.form[key]
-                    for key in request.form
-                    if key.startswith(f"{complaint}_input_")
-                ]
-                if complaint in request.form
-                else []
-                for complaint in [
-                    "retaliation", "disability", "gina", "discrete", 
-                    "non_discrete", "non_selection", "accommodation", "harassment"
-                ]
-            },
+            "complaint_type": complaint_type_data,
+            "discrete_claims": [
+                request.form[key]
+                for key in request.form
+                if key.startswith("discrete_input_")
+            ],
             "hide_investigator_info": "hide_investigator_info" in request.form,
         }
         generate_document(data)
@@ -69,12 +78,20 @@ def index():
         return redirect(url_for("index"))
     return render_template("index.html")
 
+def generate_purview_title(purview_type):
+    selected_purviews = [purview.replace('_', ' ').upper() for purview, selected in purview_type.items() if selected]
+    if not selected_purviews:
+        return ""
+    title = ", ".join(selected_purviews) + " ALLEGATIONS"
+    return title
 
 def generate_document(data):
     try:
         complainant_doc = DocxTemplate("template.docx")
         complainant_context = {
             **data,
+            # Dynamically change title 
+            "purview_title": generate_purview_title(data["purview_type"]),
             # === ADD THE PURVIEW QUESTIONS HERE ===
             "discrete_questions": [
                 f"Why do you believe your {purview.replace('_', ' ')} was a factor?  What evidence can you present to substantiate this belief?"
