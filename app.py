@@ -5,26 +5,9 @@ import os
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  # Change this to a random secret key
 
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        # List of all complaint types
-        complaint_types = [
-            "retaliation", "disability", "gina", "discrete",
-            "non_discrete", "non_selection", "accommodation", "harassment"
-        ]
-        # Build complaint_type dictionary with dynamic inputs
-        complaint_type_data = {}
-        for complaint in complaint_types:
-            # Get all inputs for this complaint type
-            inputs = [
-                request.form[key]
-                for key in request.form
-                if key.startswith(f"{complaint}_input_")
-            ]
-            complaint_type_data[complaint] = inputs
-            
         data = {
             "case_number": request.form["case_number"],
             "first_name": request.form["first_name"],
@@ -65,7 +48,19 @@ def index():
                 "national_origin": "national_origin" in request.form,
                 "age": "age" in request.form,
             },
-            "complaint_type": complaint_type_data,
+            "complaint_type": {
+                complaint: [
+                    request.form[key]
+                    for key in request.form
+                    if key.startswith(f"{complaint}_input_")
+                ]
+                if complaint in request.form
+                else []
+                for complaint in [
+                    "retaliation", "disability", "gina", "discrete", 
+                    "non_discrete", "non_selection", "accommodation", "harassment"
+                ]
+            },
             "discrete_claims": [
                 request.form[key]
                 for key in request.form
@@ -85,8 +80,22 @@ def generate_purview_title(purview_type):
     title = ", ".join(selected_purviews) + " ALLEGATIONS"
     return title
 
+# Add input validation
+def validate_input(data):
+    required_fields = ['case_number', 'first_name', 'last_name']
+    for field in required_fields:
+        if not data.get(field):
+            raise ValueError(f"Missing required field: {field}")
+    
+    if not any(data['purview_type'].values()):
+        raise ValueError("At least one purview must be selected")
+        
+    if not any(data['complaint_type'].values()):
+        raise ValueError("At least one complaint type must be selected")
+
 def generate_document(data):
     try:
+        validate_input(data)
         complainant_doc = DocxTemplate("template.docx")
         complainant_context = {
             **data,
@@ -198,7 +207,6 @@ def generate_document(data):
         }
         witness_doc.render(witness_context)
 
-
         last_name = data["last_name"]
         first_initial = data["first_name"][0]
         witness_last_name = data["witness_last_name"]
@@ -210,6 +218,14 @@ def generate_document(data):
 
     except Exception as e:
         print(f"An error occurred: {e}")
+    
+    except ValueError as e:
+        flash(str(e))
+        return False
+    except Exception as e:
+        flash(f"Error generating document: {str(e)}")
+        return False
+    return True
 
 
 if __name__ == "__main__":
