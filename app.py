@@ -96,6 +96,27 @@ def validate_input(data):
 def generate_document(data):
     try:
         validate_input(data)
+
+        # Create directories if they don't exist
+        os.makedirs("saved complainant affidavits", exist_ok=True)
+        os.makedirs("saved witness affidavits", exist_ok=True)
+        
+        # Generate filenames
+        last_name = data["last_name"]
+        first_initial = data["first_name"][0]
+        witness_last_name = data["witness_last_name"]
+        witness_first_initial = data["witness_first_name"][0]
+        case_number = data["case_number"]
+        
+        complainant_filename = f"saved complainant affidavits/{case_number} {last_name} {first_initial}.docx"
+        witness_filename = f"saved witness affidavits/{case_number} {witness_last_name} {witness_first_initial}.docx"
+        
+        # Check if files already exist - PREVENT overwriting
+        if os.path.exists(complainant_filename) or os.path.exists(witness_filename):
+            flash(f"Files for case {case_number} already exist. Please use a different case number or delete the existing files.", "error")
+            return False
+
+        # Generate Complainant Affidavit
         complainant_doc = DocxTemplate("template.docx")
         complainant_context = {
             **data,
@@ -144,6 +165,7 @@ def generate_document(data):
             "show_harassment_section": data["complaint_type"]["harassment"],
         }
         complainant_doc.render(complainant_context)
+        complainant_doc.save(complainant_filename)
 
         # Generate Witness Affidavit
         witness_doc = DocxTemplate("witnesstemplate.docx")
@@ -206,26 +228,17 @@ def generate_document(data):
             "show_harassment_section": data["complaint_type"]["harassment"],
         }
         witness_doc.render(witness_context)
+        witness_doc.save(witness_filename)
 
-        last_name = data["last_name"]
-        first_initial = data["first_name"][0]
-        witness_last_name = data["witness_last_name"]
-        witness_first_initial = data["witness_first_name"][0]
-        case_number = data["case_number"]
-        
-        complainant_doc.save(f"saved complainant affidavits/{case_number} {last_name} {first_initial}.docx")
-        witness_doc.save(f"saved witness affidavits/{case_number} {witness_last_name} {witness_first_initial}.docx")
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-    
+        flash("Documents generated successfully!", "success")
+        return True
     except ValueError as e:
-        flash(str(e))
+        flash(str(e), "error")
         return False
     except Exception as e:
-        flash(f"Error generating document: {str(e)}")
+        flash(f"Error generating document: {str(e)}", "error")
         return False
-    return True
+
 
 
 if __name__ == "__main__":
